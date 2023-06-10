@@ -1,6 +1,5 @@
 const express = require('express');
 const cors = require('cors');
-
 require('dotenv').config();
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const app = express();
@@ -25,14 +24,33 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
 
-    const db = client.db("sk-sports");
-    const courseCollection = db.collection("course")
-    app.get('/course', async (req, res) => {
-        const result = await courseCollection.find().toArray;
-        res.send(result);
-    }
-    )
 
+    const classesCollection = client.db("sk-sports").collection("classes");
+    const cartCollection = client.db("sk-sports").collection("carts");
+    //  { GET ALL CLASSES} 
+    app.get("/classes", async (req, res) => {
+      const result = await classesCollection.find({}).toArray()
+      res.send(result);
+    });
+    //  { CART SYSTEM UPDATE)
+    
+    app.get("/carts", async (req, res) => {
+      const email = req.query.email;
+      if(!email) {
+       return([]);
+      }
+      const query = {userEmail: email}
+      
+        const result = await cartCollection.find(query).toArray();
+        res.send(result);
+      
+    });
+    app.post("/carts", async (req, res) => {
+      const item = req.body;
+
+      const result = await cartCollection.insertOne(item);
+      res.send(result);
+    });
     //creating connetction with beckend
 
 
