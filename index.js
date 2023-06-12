@@ -156,7 +156,48 @@ async function run() {
       };
       const result = await userCollection.updateOne(filter, updateDoc);
       res.send(result);
+
     });
+    app.put('/classes/:id', async (req, res) => {
+      try {
+        const id = req.params.id;
+        const { feedback } = req.body;
+    
+        const filter = { _id: new ObjectId(id) };
+        const updateDoc = {
+          $set: { feedback: feedback },
+        };
+    
+        const result = await classesCollection.updateOne(filter, updateDoc);
+    
+        if (result.matchedCount === 1) {
+          res.json({ success: true, message: 'Feedback updated successfully' });
+        } else {
+          res.status(404).json({ success: false, message: 'Class not found' });
+        }
+      } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: 'Internal server error' });
+      }
+    });
+    
+    
+    
+//aprroval
+
+app.patch('/classes/:id', async (req, res) => {
+  const id = req.params.id;
+  console.log(id);
+  const filter = { _id: new ObjectId(id) };
+  const updateDoc = {
+    $set: {
+      status: 'active'
+    },
+  };
+  const result = await classesCollection.updateOne(filter, updateDoc);
+  res.send(result);
+});
+
     // Cart system update
     app.get("/carts", verifyJWT, async (req, res) => {
       const email = req.query.email;
